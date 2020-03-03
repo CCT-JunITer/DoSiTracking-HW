@@ -2,8 +2,16 @@
 
 ## Requirements
 
-* (todo): boards and used chips (ESP8266)
-* some way of flashing code to the board (e.g. Arduino IDE) 
+### Board
+
+* ESP8266 on a D1 mini
+* PN532
+* custom RGB board
+
+### libraries 
+
+* some way of flashing code to the board (e.g. Arduino IDE)
+* (todo) libraries
   
 ## Installation
 

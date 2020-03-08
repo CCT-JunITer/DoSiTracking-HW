@@ -26,7 +26,9 @@ ESP8266WiFiMulti WiFiMulti;
 
 // Define Backend url
 
-#define BACKEND_URL ("http://jigsaw.w3.org/HTTP/connection.html")
+//#define BACKEND_URL ("http://jigsaw.w3.org/HTTP/connection.html")
+#define BACKEND_URL ("http://192.168.228.199:6000/") //local testing server
+
 
 // If using the breakout or shield with I2C, define just the pins connected
 // to the IRQ and reset lines.
@@ -64,6 +66,8 @@ void setup(void) {
   Serial.print("Found chip PN5"); Serial.println((versiondata>>24) & 0xFF, HEX); 
   Serial.print("Firmware ver. "); Serial.print((versiondata>>16) & 0xFF, DEC); 
   Serial.print('.'); Serial.println((versiondata>>8) & 0xFF, DEC);
+
+  Serial.println(WiFi.macAddress());
   
   // configure board to read RFID tags
   nfc.SAMConfig();
@@ -126,15 +130,15 @@ void loop(void) {
     Serial.print("[HTTP] begin...\n");
     if (http.begin(client, BACKEND_URL)) {  // HTTP
 
-
-      Serial.print("[HTTP] GET...\n");
+      Serial.print("[HTTP] POST...\n");
       // start connection and send HTTP header
-      int httpCode = http.GET();
+      // an empty header means plain/text
+      int httpCode = http.POST(uid, uidLength);
 
       // httpCode will be negative on error
       if (httpCode > 0) {
         // HTTP header has been send and Server response header has been handled
-        Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+        Serial.printf("[HTTP] POST... code: %d\n", httpCode);
 
         // file found at server
         if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
@@ -144,7 +148,7 @@ void loop(void) {
           blink(GREEN, 500);
         }
       } else {
-        Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+        Serial.printf("[HTTP] POST... failed, error: %s\n", http.errorToString(httpCode).c_str());
         digitalWrite(BLUE, LOW);
         blink(RED, 500);
       }
